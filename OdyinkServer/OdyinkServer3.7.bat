@@ -1,5 +1,5 @@
 @echo off
-rem 3.5
+rem 3.7
 rem 初始化
     chcp 936 >nul
     title Odyink Server
@@ -42,7 +42,7 @@ rem 校阅文章
         set EBlognum=
         set /p EBlognum=文章序号：
         cls
-        if "%EBlognum%"=="q" goto :menu
+        if /i "%EBlognum%"=="q" goto :menu
     rem 预处理
         :NBBlog
         set Doctype=
@@ -55,25 +55,29 @@ rem 校阅文章
             )
         )
     rem 显示文本内容Batch
+        rem 因复合句中变量为复合句前的变量使用用延迟变量获得句中变量的动态值
+        setlocal enabledelayedexpansion
         if exist Blog\"%EBlognum%.bat" (
-            set Doctype=bat
             echo 这是Batch扩展
             echo 可在odyink\Blog\%EBlognum%.bat中查看代码
+            echo 因Batch扩展特殊性执行后果自负
             echo 查看代码是为了防病毒!!!
-            echo 回车确认执行
-            pause >nul
-            cls
-            cmd /c .\Blog\%EBlognum%.bat
-            cls
-            rem 重新初始化
-                rem 这里if复合句不能用@echo off会报错现移到:BlogconNE下一行
-                rem 这里if复合句不用cd，它会自动恢复(原因不明)而且用cd会报错
-                chcp 936 >nul
-                title Odyink Server
-                color 07
-            echo b.上一篇 q.返回列表 n.下一篇
-            echo          c.修改扩展
-            goto :BlogconNE
+            set batrunyn=
+            set /p batrunyn=是否确认执行yn:
+            if /i "!batrunyn!"=="y" (
+                cls
+                cmd /c .\Blog\%EBlognum%.bat
+                cls
+                rem 重新初始化
+                    rem 这里if复合句不能用@echo off会报错现移到:BlogconNE下一行
+                    rem 这里if复合句不用cd，它会自动恢复(原因不明)而且用cd会报错
+                    chcp 936 >nul
+                    title Odyink User
+                    color 07
+                echo b.上一篇 q.返回列表 n.下一篇
+                echo         r.刷新文章
+                goto :BlogconNE
+            )
         )
     rem 显示文本内容Text
         set Doctype=txt
@@ -88,10 +92,10 @@ rem 校阅文章
         @echo off
         set Blogcon=
         set /p Blogcon=操作序号：
-        if "%Blogcon%"=="b" goto :backBlog
-        if "%Blogcon%"=="n" goto :nextBlog
-        if "%Blogcon%"=="q" goto :VB
-        if "%Blogcon%"=="c" (
+        if /i "%Blogcon%"=="b" goto :backBlog
+        if /i "%Blogcon%"=="n" goto :nextBlog
+        if /i "%Blogcon%"=="q" goto :VB
+        if /i "%Blogcon%"=="c" (
             notepad.exe .\Blog\%EBlognum%.%Doctype%
             cls
             goto :NBBlog
@@ -152,7 +156,7 @@ rem 导入文章
         )
         rem 文章标题不能含有英引号
         set /p Blogtitle=文章标题：
-        if "%Blogtitle%"=="q" goto :cpBlog
+        if /i "%Blogtitle%"=="q" goto :cpBlog
     rem 开始导入文章
         cls
         rem 预处理
@@ -189,12 +193,12 @@ rem 删除文章
         :DelBlog
         echo 输入q退出删除
         set /p willDelBlog=要删除文章序号：
-        if "%willDelBlog%"=="q" goto :menu
+        if /i "%willDelBlog%"=="q" goto :menu
         if not exist Blog\"%willDelBlog%.*t" goto :DelBlogE
         :BackDelyn
         set /p DelBlogyn=是否删除yn:
-        if "%DelBlogyn%"=="y" goto :DelBlognow
-        if "%DelBlogyn%"=="n" goto :DelBlog
+        if /i "%DelBlogyn%"=="y" goto :DelBlognow
+        if /i "%DelBlogyn%"=="n" goto :DelBlog
         echo 输入无效
         goto :BackDelyn
     rem 开始删除文章
@@ -217,7 +221,6 @@ rem 安装
     echo 回车安装Odyink
     pause >nul
     cls
-    mkdir Odyink >nul
     mkdir odyink\Blog >nul
     cd Odyink
     if exist Blog\*.*t del /f /s /q Blog\*.*t >nul
