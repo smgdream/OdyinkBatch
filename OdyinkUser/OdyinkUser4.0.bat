@@ -22,28 +22,12 @@ rem 检测
             rem -q前有1空格
             rem win10可用https而7不行为兼容性不查证书(不安全)
             set wgetparameter= -q --no-check-certificate -P ./
-            goto :checknet
         ) else (
             set ps=use
             set wget=PowerShell Invoke-WebRequest
             rem -outfile 前后各有1空格
             set psparameter= -outfile 
         )
-    rem 检测网络
-        :checknet
-        echo 检测网络中
-        if exist index.html del index.html
-        rem psdf=PowerShell Download File
-        if "%ps%"=="use" set psdf=index.html
-        %wget%%wgetparameter% https://www.kernel.org/index.html%psparameter%%psdf%
-        rem 删除与主程序同级目录的.wget-hsts为美观[狗头]
-        if exist ..\.wget-hsts del ..\.wget-hsts
-        if exist index.html (
-            del index.html
-            goto :get
-        )
-        echo 网络出错!
-        goto :exit
 rem 看文章
     rem 下载列表
         :get
